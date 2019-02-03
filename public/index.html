@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    form { background: #000; padding: 3px; bottom: 0; width: 80%;
+        position: fixed;}
+    ul#messages {
+        height: 100vh;
+        overflow-y: scroll;
+        width: 100%;
+    }
+    form input.form-control {
+        display: inline-block; border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+  </style>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <ul id="messages"></ul>
+    </div>
+    <div class="row">
+        <form action="" class="form">
+            <input class="form-control" id="m" autocomplete="off" />
+            <button class="btn btn-primary">Send</button>
+        </form>
+    </div>
+</div>
+<script src="/javascripts/socket.io.js"></script>
+<script src="/javascripts/jquery-1.11.1.js"></script>
+<script>
+    $(function () {
+        var socket = io();
+        function list_messages(messages){
+            var message_el = $('#messages')
+            let tmp_text = "";
+                messages.reverse().map((message, index) => {
+                tmp_text += "<li>" ;
+                        tmp_text += index + ".";
+                        tmp_text += message.message
+                        tmp_text +="</li>";
+                console.dir(message)
+            })
+            message_el.html(tmp_text)
+        }
+        $('form').submit(function(e){
+            e.preventDefault(); // prevents page reloading
+            socket.emit('chat message', {
+                message: $('#m').val(),
+                client: 'Client'
+            });
+
+            $('#m').val('');
+            return false;
+        });
+        socket.on('chat message', (message_object) => {
+            console.dir(message_object.messages)
+            list_messages(message_object.messages)
+        })
+    });
+
+</script>
+</body>
+</html>
